@@ -1,0 +1,27 @@
+#Script for SSH connect via key with key and host as arguements
+#!/bin/bash
+
+key=$1
+host=$2
+height=$(tput lines)
+width=$(tput cols)
+function help {
+
+tput cud1 $((width/2)) 
+echo -e "SSHOD HELP MENU"
+tput cud1
+echo -e "USAGE : sshod arg1 arg2"
+tput cud1
+echo -e "arg1=ssh-key arg2=hostname"
+tput cud1
+tput sgr0
+
+}
+
+if [ $# -eq 0 ]
+  then
+  help
+else
+ssh -i $key $host
+fi
+
