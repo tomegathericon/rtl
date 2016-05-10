@@ -21,6 +21,10 @@ tput sgr0
 if [ $# -eq 0 ]
   then
   help
+
+elif [ "$1" == "-h" ]
+  then
+  help
 else
 ssh -i $key $host
 fi
