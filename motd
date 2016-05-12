@@ -40,7 +40,7 @@ fi
 ##### BODY #####
 
 echo -e "
-$(linux_logo -c)
+$(linux_logo -d)
 
 $salutation
 
