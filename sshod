@@ -6,16 +6,14 @@ host=$2
 height=$(tput lines)
 width=$(tput cols)
 function help {
-
-tput cud1 $((width/2)) 
-echo -e "SSHOD HELP MENU"
-tput cud1
-echo -e "USAGE : sshod arg1 arg2"
-tput cud1
-echo -e "arg1=ssh-key arg2=hostname"
-tput cud1
-tput sgr0
-
+		tput cud1 $((width/2)) 
+		echo -e "SSHOD HELP MENU"
+		tput cud1
+		echo -e "USAGE : sshod arg1 arg2"
+		tput cud1
+		echo -e "arg1=ssh-key arg2=hostname"
+		tput cud1
+		tput sgr0
 }
 
 if [ $# -eq 0 ]
