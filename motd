@@ -58,12 +58,9 @@ $salutation
 		INSERTED DEVICES            $(lsblk -sdn | grep sd[b-z] | awk '{print$1}' | sed 'N;s/\n/ /') 
 		SPACE USED         	    $(df -h | grep abode | awk '{print $3}' | sed s/G/" GB"/)         
 		SPACE AVAILABLE             $(df -h | grep abode | awk '{print $4}' | sed s/G/" GB"/)         
-		SYSTEM TEMPERATURE          $(acpi -t | awk '{print $4, $5, $6}')                             
-<<<<<<< HEAD
-		UPDATES AVAILABLE           $(pacman -Qu | wc -l)                                            
-=======
+		SYSTEM TEMPERATURE          $(acpi -t | awk '{print $4, $5, $6}')                                                                       
 		UPDATES AVAILABLE           $(pacman -Syy | wc -l)                                            
->>>>>>> 953e0821cf643b41922919709b97cd8e1abab9ed
+
        ********************************************************************************************
 	
     " > $motd 
