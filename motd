@@ -40,7 +40,7 @@ fi
 ##### BODY #####
 
 echo -e "
-$(linux_logo -c)
+$(linux_logo -d)
 
 $salutation
 
@@ -53,12 +53,17 @@ $salutation
 		SYSTEM IP                   $(printenv | grep -i ssh_connection | awk '{print $3}')                                                        
 		PUBLIC IP                   $(wget -qO- http://ipecho.net/plain)                             
 		SYSTEM UPTIME               $(uptime | awk '{print $3,$4,$5}'|  sed s/,//g) Hours            
-		CURRENT TIME                $(date)                                                          
+		CURRENT TIME                $(date)
+                LOGICAL VOLUMES             $(lvscan | wc -l)                                            
 		INSERTED DEVICES            $(lsblk -sdn | grep sd[b-z] | awk '{print$1}' | sed 'N;s/\n/ /') 
-		DOWNLOAD SPACE USED         $(df -h | grep Torrents | awk '{print $3}' | sed s/G/" GB"/)         
-		DOWNLOAD SPACE AVAILABLE    $(df -h | grep Torrents | awk '{print $4}' | sed s/G/" GB"/)         
+		SPACE USED         	    $(df -h | grep abode | awk '{print $3}' | sed s/G/" GB"/)         
+		SPACE AVAILABLE             $(df -h | grep abode | awk '{print $4}' | sed s/G/" GB"/)         
 		SYSTEM TEMPERATURE          $(acpi -t | awk '{print $4, $5, $6}')                             
+<<<<<<< HEAD
 		UPDATES AVAILABLE           $(pacman -Qu | wc -l)                                            
+=======
+		UPDATES AVAILABLE           $(pacman -Syy | wc -l)                                            
+>>>>>>> 953e0821cf643b41922919709b97cd8e1abab9ed
        ********************************************************************************************
 	
     " > $motd 
