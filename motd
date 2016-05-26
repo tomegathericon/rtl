@@ -47,13 +47,16 @@ $salutation
        ******************************************************************************************
                 USER 	                    $lu                                                              
 		SERVER	                    $Hostname                                                        
-		PROCESSOR                   $PType                                                           
-		LAST LOGIN IP	            $(last -w | grep $lu | awk NR==2 | awk '{print $3}')             
+		PROCESSOR                   $(lshw | less | grep product | awk NR==1 | sed s/product://g | sed s"/           "//g)
+                ARCHITECTURE                $PType                                           
+		RAM                         $(lshw | grep size | awk NR==1 | sed s/size://g | sed s"/           /"/g | sed s/MiB"/ MB/"g)
+                LAST LOGIN IP	            $(last -w | grep $lu | awk NR==2 | awk '{print $3}')             
 		CURRENT LOGIN IP            $(last -w | grep $lu | awk NR==1 | awk '{print $3}')              
 		SYSTEM IP                   $(printenv | grep -i ssh_connection | awk '{print $3}')                                                        
 		PUBLIC IP                   $(wget -qO- http://ipecho.net/plain)                             
 		SYSTEM UPTIME               $(uptime | awk '{print $3,$4,$5}'|  sed s/,//g) Hours            
-		CURRENT TIME                $(date)                                                          
+		CURRENT TIME                $(date) 
+                LOGICAL VOLUMES             $(lvscan | wc -l)                                                         
 		INSERTED DEVICES            $(lsblk -sdn | grep sd[b-z] | awk '{print$1}' | sed 'N;s/\n/ /') 
 		DOWNLOAD SPACE USED         $(df -h | grep Torrents | awk '{print $3}' | sed s/G/" GB"/)         
 		DOWNLOAD SPACE AVAILABLE    $(df -h | grep Torrents | awk '{print $4}' | sed s/G/" GB"/)         
@@ -61,7 +64,7 @@ $salutation
 		UPDATES AVAILABLE           $((au-1))
                                             
        ********************************************************************************************
-	
+
     " > $motd 
 
 
