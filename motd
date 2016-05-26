@@ -12,7 +12,7 @@ PType=$(uname -m)
 lu=$(last -w | awk NR==1 | awk '{print $1}')
 hour=$(date +%H)
 cip=$(finger | grep $(date +%H:%M) | awk '{print $6}' | sed 's/(/ /' | sed 's/)/ /')
-
+au=$(apt list --upgradable | wc -l)
 
 ##### SALUTATION DECLARATION #####
 if [ $hour -gt 5 -a $hour -lt 1  ];  then
@@ -40,7 +40,7 @@ fi
 ##### BODY #####
 
 echo -e "
-$(linux_logo -c)
+$(linux_logo -d)
 
 $salutation
 
@@ -58,7 +58,8 @@ $salutation
 		DOWNLOAD SPACE USED         $(df -h | grep Torrents | awk '{print $3}' | sed s/G/" GB"/)         
 		DOWNLOAD SPACE AVAILABLE    $(df -h | grep Torrents | awk '{print $4}' | sed s/G/" GB"/)         
 		SYSTEM TEMPERATURE          $(acpi -t | awk '{print $4, $5, $6}')                             
-		UPDATES AVAILABLE           $(yum check-update | wc -l)                                            
+		UPDATES AVAILABLE           $((au-1))
+                                            
        ********************************************************************************************
 	
     " > $motd 
