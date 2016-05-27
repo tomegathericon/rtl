@@ -61,7 +61,7 @@ $salutation
 		DOWNLOAD SPACE USED         $(df -h | grep Torrents | awk '{print $3}' | sed s/G/" GB"/)         
 		DOWNLOAD SPACE AVAILABLE    $(df -h | grep Torrents | awk '{print $4}' | sed s/G/" GB"/)         
 		SYSTEM TEMPERATURE          $(acpi -t | awk '{print $4, $5, $6}')                             
-		UPDATES AVAILABLE           $((au-1)                                       
+		UPDATES AVAILABLE           $((au-1))                                       
        ********************************************************************************************
 
     " > $motd 

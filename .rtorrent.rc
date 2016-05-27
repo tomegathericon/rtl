@@ -11,3 +11,4 @@ check_hash = yes
 dht = auto
 dht_port = 63425
 peer_exchange = yes
+scgi_port = 127.0.0.1:5000
