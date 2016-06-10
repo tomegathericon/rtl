@@ -47,9 +47,9 @@ $salutation
        ******************************************************************************************
                 USER 	                    $lu                                                              
 		SERVER	                    $Hostname                                                        
-		PROCESSOR                   $(lshw | less | grep product | awk NR==1 | sed s/product://g | sed s"/           "//g)
+		PROCESSOR                   $(lshw | less |grep CPU | grep product | awk NR==1 | sed s/product://g | sed s"/           "//g)
                 ARCHITECTURE                $PType                                           
-		RAM                         $(lshw | grep size | awk NR==1 | sed s/size://g | sed s"/           /"/g | sed s/MiB"/ MB/"g)
+		RAM                         $(free -h | grep Mem | awk '{print $2}')
                 LAST LOGIN IP	            $(last -w | grep $lu | awk NR==2 | awk '{print $3}')             
 		CURRENT LOGIN IP            $(last -w | grep $lu | awk NR==1 | awk '{print $3}')              
 		SYSTEM IP                   $(printenv | grep -i ssh_connection | awk '{print $3}')                                                        
