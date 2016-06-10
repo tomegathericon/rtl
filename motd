@@ -47,7 +47,8 @@ $salutation
        ******************************************************************************************
                 USER 	                    $lu                                                              
 		SERVER	                    $Hostname                                                        
-		PROCESSOR                   $(lshw | less |grep CPU | grep product | awk NR==1 | sed s/product://g | sed s"/           "//g)
+		O.E.M                       $(lshw | less | grep vendor | awk NR==1 | sed s"/    "//g | sed s"/vendor: /"/g)
+                PROCESSOR                   $(lshw | less |grep CPU | grep product | awk NR==1 | sed s/product://g | sed s"/           "//g)
                 ARCHITECTURE                $PType                                           
 		RAM                         $(free -h | grep Mem | awk '{print $2}')
                 LAST LOGIN IP	            $(last -w | grep $lu | awk NR==2 | awk '{print $3}')             
