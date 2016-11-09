@@ -1,0 +1,18 @@
+#!/bin/bash
+#while true; do
+#	loadAvg=$(cat /proc/loadavg | cut -d ' ' -f -4)
+#	timeStr=$(date '+%a %b %d %H:%M:%S')
+#	memAvail=$(grep -Po 'MemAvailable.*\d+' /proc/meminfo|cut -d ':' -f 2)
+#	memTotal=$(grep -Po 'MemTotal.*\d+' /proc/meminfo|cut -d ':' -f 2)
+#	memBusy=$(( $memTotal - $memAvail ))
+#	xsetroot -name "RAM: $(( 100 * memBusy / memTotal ))%  |  CPU: $loadAvg  |  $timeStr"
+#	sleep 1
+#done
+
+
+while true; do
+externalip=$(curl ipecho.net/plain 2>/dev/null)
+internalieip=$(ip route show | grep src | grep en | sed 's/  */ /g' | awk '{print $9}')
+internalwip=$(ip route show | grep src | grep wl | sed 's/  */ /g' | awk '{print $9}')
+xsetroot -name "IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)"
+done
