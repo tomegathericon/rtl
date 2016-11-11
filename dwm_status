@@ -1,0 +1,35 @@
+#!/bin/bash
+
+
+while true; do
+
+externalip=$(curl ipecho.net/plain 2>/dev/null)
+
+internaleip=$(ip route show | grep src | grep en | sed 's/  */ /g' | awk '{print $9}')
+
+internalwip=$(ip route show | grep src | grep wl | sed 's/  */ /g' | awk '{print $9}')
+
+battery=$(acpi -b | awk '{print $4}' | sed s/%,//)
+
+acpi -b | grep Charging >/dev/null 2>&1
+
+if [ $? -eq 0 ]; then 
+
+xsetroot -name "BATT:$battery%|IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)" -solid "#0000ff"
+
+elif [ $battery -lt 50 -a $battery -gt 15 ]; then
+
+xsetroot -name "BATT:$battery%|IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)" -solid "#ffff00"
+
+elif [ $battery -lt 15 ]; then
+
+xsetroot -name "BATT:$battery%|IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)" -solid "#ff0000"
+
+else
+
+xsetroot -name "BATT:$battery%|IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)" -solid "#008000"
+
+fi
+
+done
+

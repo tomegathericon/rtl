@@ -12,7 +12,7 @@ PType=$(uname -m)
 lu=$(last -w | awk NR==1 | awk '{print $1}')
 hour=$(date +%H)
 cip=$(finger | grep $(date +%H:%M) | awk '{print $6}' | sed 's/(/ /' | sed 's/)/ /')
-
+au=$(apt list --upgradable | wc -l)
 
 ##### SALUTATION DECLARATION #####
 if [ $hour -gt 5 -a $hour -lt 1  ];  then
@@ -47,22 +47,24 @@ $salutation
        ******************************************************************************************
                 USER 	                    $lu                                                              
 		SERVER	                    $Hostname                                                        
-		PROCESSOR                   $PType                                                           
-		LAST LOGIN IP	            $(last -w | grep $lu | awk NR==2 | awk '{print $3}')             
+		O.E.M                       $(lshw | less | grep vendor | awk NR==1 | sed s"/    "//g | sed s"/vendor: /"/g)
+                PROCESSOR                   $(lshw | less |grep CPU | grep product | awk NR==1 | sed s/product://g | sed s"/           "//g)
+                ARCHITECTURE                $PType                                           
+		RAM                         $(free -h | grep Mem | awk '{print $2}')
+                LAST LOGIN IP	            $(last -w | grep $lu | awk NR==2 | awk '{print $3}')             
 		CURRENT LOGIN IP            $(last -w | grep $lu | awk NR==1 | awk '{print $3}')              
-		SYSTEM IP                   $(printenv | grep -i ssh_connection | awk '{print $3}')                                                        
+		SYSTEM IP                   $(ip route show | grep src | grep en | sed 's/  */ /g' | awk '{print $9}')                                                        
 		PUBLIC IP                   $(wget -qO- http://ipecho.net/plain)                             
 		SYSTEM UPTIME               $(uptime | awk '{print $3,$4,$5}'|  sed s/,//g) Hours            
-		CURRENT TIME                $(date)
-                LOGICAL VOLUMES             $(lvscan | wc -l)                                            
+		CURRENT TIME                $(date) 
+                LOGICAL VOLUMES             $(lvscan | wc -l)                                                         
 		INSERTED DEVICES            $(lsblk -sdn | grep sd[b-z] | awk '{print$1}' | sed 'N;s/\n/ /') 
-		SPACE USED         	    $(df -h | grep abode | awk '{print $3}' | sed s/G/" GB"/)         
-		SPACE AVAILABLE             $(df -h | grep abode | awk '{print $4}' | sed s/G/" GB"/)         
-		SYSTEM TEMPERATURE          $(acpi -t | awk '{print $4, $5, $6}')                                                                       
-		UPDATES AVAILABLE           $(pacman -Syy | wc -l)                                            
-
+		DOWNLOAD SPACE USED         $(df -h | grep Torrents | awk '{print $3}' | sed s/G/" GB"/)         
+		DOWNLOAD SPACE AVAILABLE    $(df -h | grep Torrents | awk '{print $4}' | sed s/G/" GB"/)         
+		SYSTEM TEMPERATURE          $(acpi -t | awk '{print $4, $5, $6}')                             
+		UPDATES AVAILABLE           $((au-1))                                       
        ********************************************************************************************
-	
+
     " > $motd 
 
 

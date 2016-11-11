@@ -1,0 +1,11 @@
+#!/bin/bash
+
+updates=$(cower -u)
+
+for f in $updates; do 
+cd /home/tomegathericon/aur/
+cower -d $f
+cd $f
+makepkg -si;
+done
+
