@@ -1,13 +1,13 @@
 #!/bin/bash
 
-updates=$(cower -u)
-
-cd /home/tomegathericon/aur/
+aur=/home/tomegathericon/aur
+cd $aur
 cower -ud
 
-for f in $updates; do 
+for f in $(ls); do 
 cd $f
 makepkg -si
+cd $aur
 done
 
 
