@@ -1,13 +1,29 @@
 #!/bin/bash
 
-aur=/home/tomegathericon/aur
-cd $aur
+set -e
+
+source /etc/environment
+
+env | grep AUR > /dev/null &2>1 
+
+if [ $? -eq 0 ]; then
+
+echo "The AUR working directory is $AUR"
+
+else
+
+sudo echo -e "AUR=/aur" >> sudo /etc/environment
+source /etc/environment
+
+fi
+
+cd $AUR
 cower -ud
 
 for f in $(ls); do 
 cd $f
 makepkg -si
-cd $aur
+cd $AUR
 rm -rf $f
 done
 
