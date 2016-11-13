@@ -1,35 +1,80 @@
 #!/bin/bash
 
-
 while true; do
 
 externalip=$(curl ipecho.net/plain 2>/dev/null)
 
-internaleip=$(ip route show | grep src | grep en | sed 's/  */ /g' | awk '{print $9}')
+internaleip="|ETH:$(ip route show | grep src | grep en | sed 's/  */ /g' | awk '{print $9}')|"
 
-internalwip=$(ip route show | grep src | grep wl | sed 's/  */ /g' | awk '{print $9}')
+internalwip="|WL:$(ip route show | grep src | grep wl | sed 's/  */ /g' | awk '{print $9}')|"
+
+tunnelip="|TUN:$(ip route show | grep src | grep tun | sed 's/  */ /g' | awk '{print $9}')|"
 
 battery=$(acpi -b | awk '{print $4}' | sed s/%,//)
+
+empty_internaleip="|ETH:|"
+
+empty_internalwip="|WL:|"
+
+empty_tunnelip="|TUN:|"
+
+
+function set_status ()
+
+{
+
+a=$1
+b=$2
+c=$3
+
 
 acpi -b | grep Charging >/dev/null 2>&1
 
 if [ $? -eq 0 ]; then 
 
-xsetroot -name "BATT:$battery%|IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)" -solid "#0000ff"
+xsetroot -name "BATT:$battery%|IP:$externalip$a$b$c$(date)" -solid "#0000ff"
 
-elif [ $battery -lt 50 -a $battery -gt 15 ]; then
+elif [ $battery -le 50 -a $battery -gt 15 ]; then
 
-xsetroot -name "BATT:$battery%|IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)" -solid "#ffff00"
+xsetroot -name "BATT:$battery%|IP:$externalip$a$b$c$(date)" -solid "#ffff00"
 
-elif [ $battery -lt 15 ]; then
+elif [ $battery -le 15 ]; then
 
-xsetroot -name "BATT:$battery%|IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)" -solid "#ff0000"
+xsetroot -name "BATT:$battery%|IP:$externalip$a$b$c$(date)" -solid "#ff0000"
 
 else
 
-xsetroot -name "BATT:$battery%|IP:$externalip|ETH:$internaleip|WL:$internalwip|$(date)" -solid "#008000"
+xsetroot -name "BATT:$battery%|IP:$externalip$a$b$c$(date)" -solid "#008000"
+
+fi
+
+
+}
+
+if [ $internaleip == $empty_internaleip -a $tunnelip == $empty_tunnelip ]; then 
+
+set_status "" "$internalwip" ""
+
+elif [ $internalwip == $empty_internalwip -a $tunnelip == $empty_tunnelip ]; then  
+
+set_status "$internaleip" "" "" 
+
+elif [ $internaleip == $empty_internaleip ]; then
+
+set_status "" "$internalwip" "$tunnelip" 
+
+elif [ $internalwip == $empty_internalwip ]; then
+
+set_status "$internaleip" "" "$tunnelip"
+
+elif [ $tunnelip == $empty_tunnelip ]; then
+
+set_status "$internaleip" "$internalwip" "" 
+
+else
+
+set_status "$internaleip" "$internalwip" "$tunnelip" 
 
 fi
 
 done
-
