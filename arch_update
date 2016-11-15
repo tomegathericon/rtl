@@ -22,9 +22,9 @@ cower -ud
 
 for f in $(ls); do 
 cd $f
-makepkg -si
+makepkg -si -f --noconfirm
 cd $AUR
 rm -rf $f
 done
 
-
+sudo pacman -Syyu
