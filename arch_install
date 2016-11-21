@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -x
+
+source /etc/environment
+
+for f in $@;
+
+do 
+
+find /var/abs/ -name $f | grep $f
+
+if [ $? -eq 0 ]; then
+
+sudo pacman -S $f
+
+else
+
+cd $AUR
+
+cower -d $f
+
+cd $f
+
+makepkg -si
+
+fi
+
+shift
+
+done
+
+
