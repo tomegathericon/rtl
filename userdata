@@ -1,0 +1,29 @@
+#!/bin/bash
+
+useradd -s /bin/zsh -c "Abhishek Kapoor" -G sudo tomegathericon
+apt-get update -y
+apt-get upgrade -y
+apt-get install -y rsync git vim zsh tmux
+rsync -rvhP /home/ubuntu/.ssh/ /home/tomegathericon/
+chmod 700 /home/tomegathericon/.ssh
+chown -R tomegathericon:tomegathericon /home/tomegathericon/.ssh
+cd /home/tomegathericon/.ssh 
+git clone http://git.instances.tech/server-ssh-details .
+chown tomegathericon:tomegathericon .
+chmod 400 .
+chmod 644 known_hosts
+rsync -rvhP ssh_config /etc/ssh/
+git remote remove origin
+git remote add origin gogs:tomegathericon/server-ssh-details.git
+cd /
+mkdir -p /git/
+chmod -R 777 /git
+chown -R tomegathericon:tomegathericon /git
+cd /git
+git clone gogs:tomegathericon/rtl.git
+rsync -rvhP rtl/tmux.conf /etc/
+cd /home/tomegathericon/
+git clone gogs:tomegathericon/oh-my-zsh.git .oh-my-zsh
+rsync -rvhP .oh-my-zsh/templates/zshrc.zsh-template .zshrc
+sed -i s/robyrussell/random/g .zshrc
+chown -R tomegathericon:tomegathericon /home/tomegathericon/

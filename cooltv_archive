@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+set -x
+
+for f in $(ls /git/cooltv/);
+
+do 
+
+cd $f
+
+
+
+sed -i s{ig:cooltv/$f.git{bitbucket:cooltvdev/$f.git{g .git/config
+
+
+/git/rtl/get_all_remotes
+
+git fetch --all
+git pull --all
+git pull --tags
+
+sed -i s{bitbucket:cooltvdev/$f.git{ig:cooltv/$f.git{g .git/config
+
+git push --all
+git push --tags
+
+cd /git/cooltv
+
+done
+
+

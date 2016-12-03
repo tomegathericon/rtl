@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+set -x
+
+for f in $@;
+
+do 
+
+cd /git/cooltv/
+
+git clone bitbucket:cooltvdev/$f.git
+
+cd $f
+
+/git/rtl/get_all_remotes
+
+git fetch --all
+git pull --all
+git pull --tags
+
+sed -i s{bitbucket:cooltvdev/$f.git{ig:cooltv/$f.git{g .git/config
+
+git push --all
+git push --tags
+
+shift
+
+done
+
+
