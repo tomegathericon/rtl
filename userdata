@@ -4,7 +4,8 @@ useradd -s /bin/zsh -c "Abhishek Kapoor" -G sudo tomegathericon
 apt-get update -y
 apt-get upgrade -y
 apt-get install -y rsync git vim zsh tmux
-rsync -rvhP /home/ubuntu/.ssh/ /home/tomegathericon/
+mkdir -p /home/tomegathericon/
+rsync -rvhP /home/ubuntu/.ssh /home/tomegathericon/.ssh
 chmod 700 /home/tomegathericon/.ssh
 chown -R tomegathericon:tomegathericon /home/tomegathericon/.ssh
 cd /home/tomegathericon/.ssh 
