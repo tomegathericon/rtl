@@ -19,4 +19,11 @@ aws ec2 associate-route-table --subnet-id $subnet_id --route-table-id $rt_id --p
 
 sed -i s{rt_id{$rt_id{g skeletons/create_route.skeleton
 sed -i s{ig_id{$ig_id{g skeletons/create_route.skeleton
+
 aws ec2 create-route --cli-input-json file://skeletons/create_route.skeleton --profile $aws_profile
+
+sed -i s{$rt_id{rt_id{g skeletons/create_route.skeleton
+sed -i s{$ig_id{ig_id{g skeletons/create_route.skeleton
+
+elastic_ip=$(aws ec2 allocate-address --domain vpc --profile $aws_profile | jq '.PublicIp' | sed 's/"//g')
+
