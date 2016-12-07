@@ -1,0 +1,65 @@
+#!/bin/bash
+set -x
+useradd -s /bin/zsh -c "Abhishek Kapoor" -G wheel tomegathericon
+yum update -y
+yum upgrade -y
+yum install -y rsync git vim zsh tmux
+mkdir -p /home/tomegathericon/
+rsync -rvhP /home/ec2-user/.ssh /home/tomegathericon/.ssh
+chmod 700 /home/tomegathericon/.ssh
+chown -R tomegathericon:tomegathericon /home/tomegathericon/.ssh
+cd /home/tomegathericon/
+touch /home/tomegathericon/gogs
+echo -e "-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEA70Bri8Lr+0zgFIpTXPhJhj66cmSNpMcGruGGUhCvh+GO8w45
+LT0r/D+1Bshx0fJbjH7O7YOwVJCfeNY1stWzo+aOwIdQgk9cfyxw37eJdiSVRW9T
+C6kSy/OqmYhXRqBuxQ2nad7wpwE+zpNsSsBRNCp4ZtL5eOwBgxOS+N0rT/XsztB3
+0klnHC8NUY9lczue9yoL2fYUYODiMjtD/4Wpfpe8IBblUWueCeAuMtdoCX+z7NSb
+9R69OXGFsBRAuBDNc/+K+lRVUn1hOL6ZOf1DJdNcgdzlA+JGdRTBoMfcPJsaPG6I
+K40hmk72+VuaYu2LqkEEr+5/rHGqsTO7VmG1pQIDAQABAoIBABSaq6hhpQkDWdjr
+ALrk9xAEnvHzDu+95Clzaqnune9J0ZHFC8+FkSAsLF7lLEg0YwX6db+ms6zUt6ck
+a4N3O/1Fgc262YgfZYveO+pIWCJAjEpqh/BdIy1FUs/eGgYPEvsNbfmEJZ18Ufhg
+YdceMOAZOD1CthFf4dF0AhhEk9JS5Oy6LWCkil+SZ1ESRd5xpsGG6lIyatWQk4dN
+0ayTNqNypML4HL50QZan1NRRCyJ2eLFfT/npRFkwZvliiAwX0qSU5+Jrg1jEuP/s
+4dgncD3dtdPJ2xxuV7/A06zHZIEapOAQxwjOfz077cobz9+kbgPWklMx1CA/IhNv
+rTbMLQECgYEA+mVJc48Yf5PFRe5saouVb1+pNM0McUkcqnjfsUUMf00xpR20fwMU
+FdtUOFtjrEgMkNk20RMapmVeUTrNDzfVZRFaVpaNmWfHmy48nEauFTKfL1prfhFC
+/mOE+5r9hvGI0VRhEwrKgk7wD9zgPbigASBbvbg/R6DnJKiVBkU0DTUCgYEA9JtH
+yHGM71ROnVGlqK8Qc02VtikutzuJBXkR3hhqJEQ1o1098eRXKss9PgtwITLFi5ac
+GTSxQP2WvETy8bMJ7yuxKHIjAKqpWyYAALanJ+dSfUdjqcrSnlXA96l75YJD6EMO
+Z8/FtFpJLN649XSV23Hrh3ogdot751iNQqcoxLECgYBLc2HitGfJaZm0LNf2cwEg
+gk7WXkM1j7ZXl/yvygKuCXDANGdDLoZK38BNCxzJuRwwOYPPFFafdUQqbfGEeGqQ
+/d2e4dbhNuhq1k/lN1cVhB97gV+KqWDqjspvlpB2rSlxCmAGAOZsxaSI4yGe95cf
+P8TlMjO/PbjozvO44/l/UQKBgQCXwc8jWO+rfI7Zo9I3eYWnQ7disOI+5Dz6nEat
+mFAh9/+fPzYzYQuDjVyNpeMHdcyB8gseyEZAoBRo8g4YTpAXRvA+u7FjtH4mAsl1
+p9zFMQtIloYKzb8mZOW3wfsQRWWEMDY7yfhLEMjdgcEW6CIhZ+hMwURqx9czjQj3
+FWaBwQKBgAMW+UPnNYr56P/fdaLJiSkY+U5WDBD4a7mw8yEMYLAHwO97IAAevi8y
+cHw9UbLMgePsHpRYDpQ8zfdSbP2ILKr968o1slaSbkb+qGq4aDMNiatJIMw/6/C9
+AFrkkGsiJCcxsdsOTdCyzU3lEP3LN+/nQhvUfRqmlVbDyNCx++xP
+-----END RSA PRIVATE KEY-----
+" > /home/tomegathericon/gogs
+chown tomegathericon:tomegathericon /home/tomegathericon/gogs
+chmod 400 /home/tomegathericon/gogs
+GIT_SSH_COMMAND="ssh -i /home/tomegathericon/gogs" git clone git@git.instances.tech:tomegathericon/server-ssh-details
+rsync -rvhP server-ssh-details/* .ssh/ 
+chown -R tomegathericon:tomegathericon .ssh
+cd .ssh
+chmod 400 *
+chmod 644 known_hosts
+rsync -rvhP ssh_config /etc/ssh/
+git init
+git remote remove origin
+git remote add origin gogs:tomegathericon/server-ssh-details.git
+cd /
+mkdir -p /git/
+chmod -R 777 /git
+chown -R tomegathericon:tomegathericon /git
+cd /git
+git clone gogs:tomegathericon/rtl.git
+rsync -rvhP rtl/tmux.conf /etc/
+cd /home/tomegathericon/
+GIT_SSH_COMMAND="ssh -i /home/tomegathericon/gogs" git clone gogs:tomegathericon/oh-my-zsh.git .oh-my-zsh
+rsync -rvhP .oh-my-zsh/templates/zshrc.zsh-template .zshrc
+sed -i s/robyrussell/random/g .zshrc
+chown -R tomegathericon:tomegathericon /home/tomegathericon/
+echo ECS_CLUSTER=tomegathericon >> /etc/ecs/ecs.config

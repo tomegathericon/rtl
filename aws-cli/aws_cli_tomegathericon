@@ -4,9 +4,14 @@ set -x
 cidr_vpc=6.255.255.0/24
 cidr_subnet=$cidr_vpc
 aws_profile=kapoor.neelima@outlook.com
-key_dir=./keys
+key_dir=keys
 key_name=aws-$(openssl rand -hex 8)
 sg_name=OpenWorld
+ami_id=ami-eca289fb
+instance_type=t2.micro
+blockmapping=skeletons/ec2_block_mapping
+userdata=userdata/amazon-linux
+
 vpc_id=$(aws ec2 create-vpc  --cidr-block $cidr_vpc --profile $aws_profile | jq '.Vpc.VpcId' | sed 's/"//g')
 
 subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $cidr_subnet --profile $aws_profile | jq '.Subnet.SubnetId' | sed 's/"//g')
@@ -39,4 +44,8 @@ sg_id=$(aws ec2 create-security-group --group-name $sg_name --description $sg_na
 
 aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol all --port 0-65535 --cidr 0.0.0.0/0 --profile $aws_profile
 
+cd -
 
+instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type $instance_type --key-name $key_name --user-data file://$userdata --subnet-id $subnet_id --security-group-ids $sg_id --block-device-mappings file://$blockmapping --profile $aws_profile | jq '.Instances | .[0].InstanceId' | sed 's/"//g') 
+
+#aws ec2 associate-address --instance-id $instance_id --public-ip $elastic_ip --profile $aws_profile
