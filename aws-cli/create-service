@@ -1,0 +1,5 @@
+{
+    "serviceName": "tomegathericon",
+    "taskDefinition": "tomegathericon",
+    "desiredCount": 10
+}

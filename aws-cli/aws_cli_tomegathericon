@@ -1,0 +1,14 @@
+#!/bin/zsh
+set -x
+
+cidr_vpc=6.255.255.0/24
+cidr_subnet=$cidr_vpc
+aws_profile=kapoor.neelima@outlook.com
+
+aws ec2 create-vpc  --cidr-block $cidr_vpc --profile $aws_profile
+sed -i s{0.0.0.0/0{$cidr_vpc{g skeletons/describe_vpc.skeleton
+
+
+vpc_id=$(aws ec2 describe-vpcs --cli-input-json file://skeletons/describe_vpc.skeleton --profile $aws_profile | jq '.Vpcs | .[0].VpcId' | sed s'/"//g')
+
+

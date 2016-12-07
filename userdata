@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 useradd -s /bin/zsh -c "Abhishek Kapoor" -G sudo tomegathericon
 apt-get update -y
 apt-get upgrade -y
@@ -8,7 +8,7 @@ mkdir -p /home/tomegathericon/
 rsync -rvhP /home/ubuntu/.ssh /home/tomegathericon/.ssh
 chmod 700 /home/tomegathericon/.ssh
 chown -R tomegathericon:tomegathericon /home/tomegathericon/.ssh
-cd /home/tomegathericon/.ssh 
+cd /home/tomegathericon/
 touch /home/tomegathericon/gogs
 echo -e "-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA70Bri8Lr+0zgFIpTXPhJhj66cmSNpMcGruGGUhCvh+GO8w45
@@ -40,9 +40,11 @@ AFrkkGsiJCcxsdsOTdCyzU3lEP3LN+/nQhvUfRqmlVbDyNCx++xP
 " > /home/tomegathericon/gogs
 chown tomegathericon:tomegathericon /home/tomegathericon/gogs
 chmod 400 /home/tomegathericon/gogs
-GIT_SSH_COMMAND="ssh -i /home/tomegathericon/gogs" git clone git@git.instances.tech:tomegathericon/server-ssh-details .
-chown tomegathericon:tomegathericon .
-chmod 400 .
+GIT_SSH_COMMAND="ssh -i /home/tomegathericon/gogs" git clone git@git.instances.tech:tomegathericon/server-ssh-details
+rsync -rvhP server-ssh-details/* .ssh/ 
+chown -R tomegathericon:tomegathericon .ssh
+cd .ssh
+chmod 400 *
 chmod 644 known_hosts
 rsync -rvhP ssh_config /etc/ssh/
 git remote remove origin
@@ -55,7 +57,7 @@ cd /git
 git clone gogs:tomegathericon/rtl.git
 rsync -rvhP rtl/tmux.conf /etc/
 cd /home/tomegathericon/
-git clone gogs:tomegathericon/oh-my-zsh.git .oh-my-zsh
+GIT_SSH_COMMAND="ssh -i /home/tomegathericon/gogs" git clone gogs:tomegathericon/oh-my-zsh.git .oh-my-zsh
 rsync -rvhP .oh-my-zsh/templates/zshrc.zsh-template .zshrc
 sed -i s/robyrussell/random/g .zshrc
 chown -R tomegathericon:tomegathericon /home/tomegathericon/
