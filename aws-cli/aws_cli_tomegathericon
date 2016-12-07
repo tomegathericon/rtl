@@ -4,7 +4,9 @@ set -x
 cidr_vpc=6.255.255.0/24
 cidr_subnet=$cidr_vpc
 aws_profile=kapoor.neelima@outlook.com
-
+key_dir=./keys
+key_name=aws-$(openssl rand -hex 8)
+sg_name=OpenWorld
 vpc_id=$(aws ec2 create-vpc  --cidr-block $cidr_vpc --profile $aws_profile | jq '.Vpc.VpcId' | sed 's/"//g')
 
 subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $cidr_subnet --profile $aws_profile | jq '.Subnet.SubnetId' | sed 's/"//g')
@@ -26,4 +28,15 @@ sed -i s{$rt_id{rt_id{g skeletons/create_route.skeleton
 sed -i s{$ig_id{ig_id{g skeletons/create_route.skeleton
 
 elastic_ip=$(aws ec2 allocate-address --domain vpc --profile $aws_profile | jq '.PublicIp' | sed 's/"//g')
+
+cd $key_dir
+
+ssh-keygen -t rsa -f $key_name -N ''
+
+aws ec2 import-key-pair --key-name $key_name --public-key-material "$(cat $key_name.pub)" --profile $aws_profile
+
+sg_id=$(aws ec2 create-security-group --group-name $sg_name --description $sg_name --vpc-id $vpc_id --profile $aws_profile | jq '.GroupId' | sed 's/"//g')
+
+aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol all --port 0-65535 --cidr 0.0.0.0/0 --profile $aws_profile
+
 
