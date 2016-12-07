@@ -1,11 +1,10 @@
 {
     "Filters": [
         {
-            "Name": "cidr",
+            "Name": "vpc-id",
             "Values": [
-                "6.255.255.0/24"
+                "vpc-ea0bc38c"
             ]
         }
     ]
 }
-

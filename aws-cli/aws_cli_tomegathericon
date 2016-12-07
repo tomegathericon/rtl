@@ -8,7 +8,10 @@ aws_profile=kapoor.neelima@outlook.com
 aws ec2 create-vpc  --cidr-block $cidr_vpc --profile $aws_profile
 sed -i s{0.0.0.0/0{$cidr_vpc{g skeletons/describe_vpc.skeleton
 
-
 vpc_id=$(aws ec2 describe-vpcs --cli-input-json file://skeletons/describe_vpc.skeleton --profile $aws_profile | jq '.Vpcs | .[0].VpcId' | sed s'/"//g')
+aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $cidr_subnet --profile $aws_profile
+aws ec2 create-internet-gateway --profile $aws_profile
 
+sed -i s{vpc-id-name{$vpc_id{g skeletons/describe_subnets.skeleton
+subnet_id=$(aws ec2 describe-subnets --cli-input-json file://skeletons/describe_subnets.skeleton --profile $aws_profile | jq '.Subnets | .[0].SubnetId' | sed 's/"//g')
 
