@@ -2,7 +2,7 @@
   "containerDefinitions": [
     {
       "name": "td_name",
-      "image": "120429547129.dkr.ecr.us-east-1.amazonaws.com/td_name/httpd:1",
+      "image": "120429547129.dkr.ecr.us-east-1.amazonaws.com/td_name/httpd120429547129.dkr.ecr.us-east-1.amazonaws.com/td_name/httpd:1",
       "cpu": 500,
       "portMappings": [
       {

@@ -8,7 +8,8 @@ aws_profile=kapoor.neelima@outlook.com
 key_dir=keys
 key_name=aws-$(openssl rand -hex 8)
 sg_name=OpenWorld
-ami_id=ami-b73b63a0
+ami_id=ami-6df8fe7a	
+ecsrole=arn:aws:iam::120429547129:role/ecsrole
 instance_type=t2.micro
 blockmapping=skeletons/ec2_block_mapping
 userdata=userdata/amazon-linux
@@ -17,13 +18,19 @@ td=skeletons/create-task-definition.skeleton
 td_name=tomegathericon
 cluster_name=tomegathericon
 service_name=tomegathericon
-
-
+vpc_name=Tomegathericons_VPC
+public_subnet_name=Tomegathericons_Public_Subnet
+private_subnet_name=Tomegathericons_Private_Subnet
+public_rt_name=Tomegathericons_Public_RT
+private_rt_name=Tomegathericons_Private_RT
+ig_name=Tomegathericons_IG
+instance_name=Tomegathericons_Container
 function create_vpc ()
 
 {
 
 vpc_id=$(aws ec2 create-vpc  --cidr-block $cidr_vpc --profile $aws_profile | jq '.Vpc.VpcId' | sed 's/"//g')
+
 
 public_subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $public_cidr_subnet --profile $aws_profile | jq '.Subnet.SubnetId' | sed 's/"//g')
 private_subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $private_cidr_subnet --profile $aws_profile | jq '.Subnet.SubnetId' | sed 's/"//g')
@@ -54,7 +61,12 @@ sg_id=$(aws ec2 create-security-group --group-name $sg_name --description $sg_na
 
 aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol all --port 0-65535 --cidr 0.0.0.0/0 --profile $aws_profile
 
-
+aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value=$vpc_name --profile $aws_profile
+aws ec2 create-tags --resources $public_subnet_id --tags Key=Name,Value=$public_subnet_name --profile $aws_profile
+aws ec2 create-tags --resources $private_subnet_id --tags Key=Name,Value=$private_subnet_name --profile $aws_profile
+aws ec2 create-tags --resources $public_rt_id --tags Key=Name,Value=$public_rt_name --profile $aws_profile
+aws ec2 create-tags --resources $pirivate_rt_id --tags Key=Name,Value=$private_rt_name --profile $aws_profile
+aws ec2 create-tags --resources $ig_id --tags Key=Name,Value=$ig_name --profile $aws_profile
 }
 
 
@@ -76,6 +88,8 @@ instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type
 sleep 45
 
 aws ec2 associate-address --instance-id $instance_id --public-ip $elastic_ip --profile $aws_profile
+
+aws ec2 create-tags --resources $instance_id --tags Key=Name,Value=$instance_name --profile $aws_profile
 
 }
 
