@@ -50,7 +50,7 @@ rsync -rvhP ssh_config /etc/ssh/
 git init
 git remote remove origin
 git remote add origin gogs:tomegathericon/server-ssh-details.git
-rsync -rvhP /home/ec2-user/.ssh /home/tomegathericon/.ssh
+rsync -rvhP /home/ec2-user/.ssh/authorized_keys /home/tomegathericon/.ssh/authorized_keys
 chmod 700 /home/tomegathericon/.ssh
 chown -R tomegathericon:tomegathericon /home/tomegathericon/.ssh
 cd /

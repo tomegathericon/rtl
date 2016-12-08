@@ -1,8 +1,9 @@
 #!/bin/zsh
 set -x
 
-cidr_vpc=6.255.255.0/24
-cidr_subnet=$cidr_vpc
+cidr_vpc=6.255.0.0/16
+public_cidr_subnet=6.255.255.0/24
+private_cidr_subnet=6.255.1.0/24
 aws_profile=kapoor.neelima@outlook.com
 key_dir=keys
 key_name=aws-$(openssl rand -hex 8)
@@ -14,22 +15,27 @@ userdata=userdata/amazon-linux
 
 vpc_id=$(aws ec2 create-vpc  --cidr-block $cidr_vpc --profile $aws_profile | jq '.Vpc.VpcId' | sed 's/"//g')
 
-subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $cidr_subnet --profile $aws_profile | jq '.Subnet.SubnetId' | sed 's/"//g')
+public_subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $public_cidr_subnet --profile $aws_profile | jq '.Subnet.SubnetId' | sed 's/"//g')
+private_subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block $private_cidr_subnet --profile $aws_profile | jq '.Subnet.SubnetId' | sed 's/"//g')
 
 ig_id=$(aws ec2 create-internet-gateway --profile $aws_profile | jq '.InternetGateway.InternetGatewayId' | sed 's/"//g')
 
 aws ec2 attach-internet-gateway --internet-gateway-id $ig_id --vpc-id $vpc_id --profile $aws_profile
 
-rt_id=$(aws ec2 create-route-table --vpc-id $vpc_id --profile $aws_profile | jq '.RouteTable.RouteTableId' | sed 's/"//g')
+public_rt_id=$(aws ec2 create-route-table --vpc-id $vpc_id --profile $aws_profile | jq '.RouteTable.RouteTableId' | sed 's/"//g')
 
-aws ec2 associate-route-table --subnet-id $subnet_id --route-table-id $rt_id --profile $aws_profile
+aws ec2 associate-route-table --subnet-id $public_subnet_id --route-table-id $public_rt_id --profile $aws_profile
 
-sed -i s{rt_id{$rt_id{g skeletons/create_route.skeleton
+private_rt_id=$(aws ec2 create-route-table --vpc-id $vpc_id --profile $aws_profile | jq '.RouteTable.RouteTableId' | sed 's/"//g')
+
+aws ec2 associate-route-table --subnet-id $private_subnet_id --route-table-id $private_rt_id --profile $aws_profile
+
+sed -i s{rt_id{$public_rt_id{g skeletons/create_route.skeleton
 sed -i s{ig_id{$ig_id{g skeletons/create_route.skeleton
 
 aws ec2 create-route --cli-input-json file://skeletons/create_route.skeleton --profile $aws_profile
 
-sed -i s{$rt_id{rt_id{g skeletons/create_route.skeleton
+sed -i s{$public_rt_id{rt_id{g skeletons/create_route.skeleton
 sed -i s{$ig_id{ig_id{g skeletons/create_route.skeleton
 
 elastic_ip=$(aws ec2 allocate-address --domain vpc --profile $aws_profile | jq '.PublicIp' | sed 's/"//g')
@@ -46,7 +52,7 @@ aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol all --port
 
 cd -
 
-instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type $instance_type --key-name $key_name --subnet-id $subnet_id --security-group-ids $sg_id --block-device-mappings file://$blockmapping --user-data file://$userdata --profile $aws_profile | jq '.Instances | .[0].InstanceId' | sed 's/"//g' )
+instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type $instance_type --key-name $key_name --subnet-id $public_subnet_id --security-group-ids $sg_id --block-device-mappings file://$blockmapping --user-data file://$userdata --profile $aws_profile | jq '.Instances | .[0].InstanceId' | sed 's/"//g' )
 
 sleep 45
 
