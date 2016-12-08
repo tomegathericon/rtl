@@ -1,0 +1,18 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "td_name",
+      "image": "td_image",
+      "cpu": 500,
+      "portMappings": [
+      {
+        "containerPort":80,
+        "hostPort": 0,
+        "protocol": "tcp"
+      }],
+      "memory": 500,
+      "essential": true
+    }
+  ],
+  "family": "tomegathericon"
+}

@@ -12,6 +12,16 @@ ami_id=ami-b73b63a0
 instance_type=t2.micro
 blockmapping=skeletons/ec2_block_mapping
 userdata=userdata/amazon-linux
+docker_repo_name=tomegathericon
+td=skeletons/create-task-definition.skeleton
+td_name=tomegathericon
+cluster_name=tomegathericon
+service_name=tomegathericon
+
+
+function create_vpc ()
+
+{
 
 vpc_id=$(aws ec2 create-vpc  --cidr-block $cidr_vpc --profile $aws_profile | jq '.Vpc.VpcId' | sed 's/"//g')
 
@@ -40,20 +50,92 @@ sed -i s{$ig_id{ig_id{g skeletons/create_route.skeleton
 
 elastic_ip=$(aws ec2 allocate-address --domain vpc --profile $aws_profile | jq '.PublicIp' | sed 's/"//g')
 
+sg_id=$(aws ec2 create-security-group --group-name $sg_name --description $sg_name --vpc-id $vpc_id --profile $aws_profile | jq '.GroupId' | sed 's/"//g')
+
+aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol all --port 0-65535 --cidr 0.0.0.0/0 --profile $aws_profile
+
+
+}
+
+
+function create_instance ()
+
+{
+
 cd $key_dir
 
 ssh-keygen -t rsa -f $key_name -N ''
 
 aws ec2 import-key-pair --key-name $key_name --public-key-material "$(cat $key_name.pub)" --profile $aws_profile
 
-sg_id=$(aws ec2 create-security-group --group-name $sg_name --description $sg_name --vpc-id $vpc_id --profile $aws_profile | jq '.GroupId' | sed 's/"//g')
 
-aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol all --port 0-65535 --cidr 0.0.0.0/0 --profile $aws_profile
-
-cd -
+cd /git/rtl/aws-cli
 
 instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type $instance_type --key-name $key_name --subnet-id $public_subnet_id --security-group-ids $sg_id --block-device-mappings file://$blockmapping --user-data file://$userdata --profile $aws_profile | jq '.Instances | .[0].InstanceId' | sed 's/"//g' )
 
 sleep 45
 
 aws ec2 associate-address --instance-id $instance_id --public-ip $elastic_ip --profile $aws_profile
+
+}
+
+function create_registry ()
+
+{
+
+registry_id=$(aws ecr create-repository --repository-name $docker_repo_name --profile $aws_profile | jq '.repository.registryUri' | sed 's/"//g')
+
+}
+
+function create_cluster ()
+
+{
+
+aws ecs create-cluster --cluster-name tomegathericon --profile $aws_profile
+
+}
+
+
+function create_docker_image ()
+
+{
+
+cd /git/docker/httpd/
+
+docker build -t $registry_id/httpd .
+
+docker tag $registry_id/httpd:latest $registry_id/httpd:1
+
+cd /git/rtl/aws-cli
+
+docker push $registry_id/httpd:1
+
+}
+
+function create_task_definition ()
+
+{
+
+td_image=$registry_id/httpd:1
+
+sed -i s{td_name{$td_name{g $td
+sed -i s{td_image{$td_image{g $td
+
+td_arn=$(aws ecs register-task-definition --cli-input-json file://$td --profile $aws_profile | jq '.taskDefinition.taskDefinitionArn' | sed 's/"//g')
+
+
+sed -i s{$td_name{td_name{g $td
+sed -i s{$td_image{td_image{g $td
+
+}
+
+function create_service ()
+
+{
+aws ecs create-service --cluster $cluster_name --service-name $service_name --task-definition $td_arn  --desired-count 1 --profile $aws_profile
+
+}
+
+
+$@
+shift
