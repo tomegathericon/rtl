@@ -2,7 +2,7 @@
   "containerDefinitions": [
     {
       "name": "td_name",
-      "image": "td_image",
+      "image": "120429547129.dkr.ecr.us-east-1.amazonaws.com/td_name/httpd:1",
       "cpu": 500,
       "portMappings": [
       {
@@ -14,5 +14,5 @@
       "essential": true
     }
   ],
-  "family": "tomegathericon"
+  "family": "td_name"
 }

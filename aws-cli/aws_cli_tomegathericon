@@ -12,7 +12,7 @@ ami_id=ami-b73b63a0
 instance_type=t2.micro
 blockmapping=skeletons/ec2_block_mapping
 userdata=userdata/amazon-linux
-docker_repo_name=tomegathericon
+docker_repo_name=tomegathericon/httpd
 td=skeletons/create-task-definition.skeleton
 td_name=tomegathericon
 cluster_name=tomegathericon
@@ -83,7 +83,7 @@ function create_registry ()
 
 {
 
-registry_id=$(aws ecr create-repository --repository-name $docker_repo_name --profile $aws_profile | jq '.repository.registryUri' | sed 's/"//g')
+registry_id=$(aws ecr create-repository --repository-name $docker_repo_name --profile $aws_profile | jq '.repository.repositoryUri' | sed 's/"//g')
 
 }
 
@@ -102,13 +102,21 @@ function create_docker_image ()
 
 cd /git/docker/httpd/
 
-docker build -t $registry_id/httpd .
+docker build -t $registry_id .
 
-docker tag $registry_id/httpd:latest $registry_id/httpd:1
+docker tag "$registry_id":latest $registry_id:1
 
 cd /git/rtl/aws-cli
 
-docker push $registry_id/httpd:1
+}
+
+function push_to_ecr ()
+
+{
+
+$(aws ecr get-login --profile $aws_profile)
+
+docker push $registry_id:1
 
 }
 
@@ -116,7 +124,7 @@ function create_task_definition ()
 
 {
 
-td_image=$registry_id/httpd:1
+td_image=$registry_id:1
 
 sed -i s{td_name{$td_name{g $td
 sed -i s{td_image{$td_image{g $td
@@ -136,6 +144,10 @@ aws ecs create-service --cluster $cluster_name --service-name $service_name --ta
 
 }
 
+for f in $@; do
 
-$@
+$f
+
 shift
+
+done
