@@ -1,9 +1,9 @@
 #!/bin/bash
 set -x
-useradd -s /bin/zsh -c "Abhishek Kapoor" -G wheel tomegathericon
 yum update -y
 yum upgrade -y
 yum install -y rsync git vim zsh tmux ecs-init
+useradd -s /bin/zsh -c "Abhishek Kapoor" -G wheel,docker tomegathericon
 mkdir -p /home/tomegathericon/
 rsync -rvhP /home/ec2-user/.ssh /home/tomegathericon/.ssh
 chmod 700 /home/tomegathericon/.ssh
@@ -67,4 +67,6 @@ sed -i s/robyrussell/random/g .zshrc
 chown -R tomegathericon:tomegathericon /home/tomegathericon/
 echo ECS_CLUSTER=tomegathericon >> /etc/ecs/ecs.config
 echo -e " %wheel ALL=(ALL)       NOPASSWD: ALL" | tee -a /etc/sudoers
+service docker start
+start ecs
 
