@@ -46,7 +46,7 @@ aws ec2 authorize-security-group-ingress --group-id $sg_id --protocol all --port
 
 cd -
 
-instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type $instance_type --key-name $key_name --subnet-id $subnet_id --security-group-ids $sg_id --user-data file://$userdata --block-device-mappings file://$blockmapping --profile $aws_profile | jq '.Instances | .[0].InstanceId' | sed 's/"//g' )
+instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type $instance_type --key-name $key_name --subnet-id $subnet_id --security-group-ids $sg_id --block-device-mappings file://$blockmapping --user-data file://$userdata --profile $aws_profile | jq '.Instances | .[0].InstanceId' | sed 's/"//g' )
 
 sleep 45
 

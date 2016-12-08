@@ -3,7 +3,7 @@ set -x
 useradd -s /bin/zsh -c "Abhishek Kapoor" -G wheel tomegathericon
 yum update -y
 yum upgrade -y
-yum install -y rsync git vim zsh tmux
+yum install -y rsync git vim zsh tmux ecs-init
 mkdir -p /home/tomegathericon/
 rsync -rvhP /home/ec2-user/.ssh /home/tomegathericon/.ssh
 chmod 700 /home/tomegathericon/.ssh
@@ -40,7 +40,7 @@ AFrkkGsiJCcxsdsOTdCyzU3lEP3LN+/nQhvUfRqmlVbDyNCx++xP
 " > /home/tomegathericon/gogs
 chown tomegathericon:tomegathericon /home/tomegathericon/gogs
 chmod 400 /home/tomegathericon/gogs
-GIT_SSH_COMMAND="ssh -i /home/tomegathericon/gogs" git clone git@git.instances.tech:tomegathericon/server-ssh-details
+GIT_SSH_COMMAND="ssh -oStrictHostKeyChecking=no -i /home/tomegathericon/gogs" git clone git@git.instances.tech:tomegathericon/server-ssh-details
 rsync -rvhP server-ssh-details/* .ssh/ 
 chown -R tomegathericon:tomegathericon .ssh
 cd .ssh
@@ -50,6 +50,9 @@ rsync -rvhP ssh_config /etc/ssh/
 git init
 git remote remove origin
 git remote add origin gogs:tomegathericon/server-ssh-details.git
+rsync -rvhP /home/ec2-user/.ssh /home/tomegathericon/.ssh
+chmod 700 /home/tomegathericon/.ssh
+chown -R tomegathericon:tomegathericon /home/tomegathericon/.ssh
 cd /
 mkdir -p /git/
 chmod -R 777 /git
@@ -58,8 +61,10 @@ cd /git
 git clone gogs:tomegathericon/rtl.git
 rsync -rvhP rtl/tmux.conf /etc/
 cd /home/tomegathericon/
-GIT_SSH_COMMAND="ssh -i /home/tomegathericon/gogs" git clone gogs:tomegathericon/oh-my-zsh.git .oh-my-zsh
+GIT_SSH_COMMAND="ssh -oStrictHostKeyChecking=no -i /home/tomegathericon/gogs" git clone gogs:tomegathericon/oh-my-zsh.git .oh-my-zsh
 rsync -rvhP .oh-my-zsh/templates/zshrc.zsh-template .zshrc
 sed -i s/robyrussell/random/g .zshrc
 chown -R tomegathericon:tomegathericon /home/tomegathericon/
 echo ECS_CLUSTER=tomegathericon >> /etc/ecs/ecs.config
+echo -e " %wheel ALL=(ALL)       NOPASSWD: ALL" | tee -a /etc/sudoers
+
