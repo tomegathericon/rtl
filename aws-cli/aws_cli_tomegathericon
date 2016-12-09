@@ -25,6 +25,7 @@ public_rt_name=Tomegathericons_Public_RT
 private_rt_name=Tomegathericons_Private_RT
 ig_name=Tomegathericons_IG
 instance_name=Tomegathericons_Container
+
 function create_vpc ()
 
 {
@@ -83,7 +84,7 @@ aws ec2 import-key-pair --key-name $key_name --public-key-material "$(cat $key_n
 
 cd /git/rtl/aws-cli
 
-instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type $instance_type --key-name $key_name --subnet-id $public_subnet_id --security-group-ids $sg_id --block-device-mappings file://$blockmapping --user-data file://$userdata --profile $aws_profile | jq '.Instances | .[0].InstanceId' | sed 's/"//g' )
+instance_id=$(aws ec2 run-instances --image-id $ami_id --count 1 --instance-type $instance_type --key-name $key_name --subnet-id $public_subnet_id --security-group-ids $sg_id --block-device-mappings file://$blockmapping --user-data file://$userdata --iam-instance-profile "Name= ecsRole"  --profile $aws_profile | jq '.Instances | .[0].InstanceId' | sed 's/"//g' )
 
 sleep 45
 
@@ -155,6 +156,21 @@ function create_service ()
 
 {
 aws ecs create-service --cluster $cluster_name --service-name $service_name --task-definition $td_arn  --desired-count 1 --profile $aws_profile
+
+}
+
+
+function create_ecs_iam_role ()
+
+{
+
+aws iam create-role --role-name ecsRole --assume-role-policy-document file://roles/ecsPolicy --profile $aws_profile
+
+aws iam put-role-policy --role-name ecsRole --policy-name ecsRolePolicy  --policy-document file://roles/rolePolicy --profile $aws_profile
+
+aws iam create-instance-profile --instance-profile-name tomegathericon
+
+aws iam add-role-to-instance-profile --instance-profile-name tomegathericon  --role-name ecsRole --profile $aws_profile
 
 }
 
