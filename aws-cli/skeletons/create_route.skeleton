@@ -1,5 +1,0 @@
-{
-    "RouteTableId": "rt_id",
-    "DestinationCidrBlock": "0.0.0.0/0",
-    "GatewayId": "ig_id"
-}
