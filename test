@@ -1,5 +1,7 @@
 #!/bin/bash
 
+asd
+
 banner -Cl QWERTYUIOPASDFGHJKLZXCVBNMLKJAGHDAHDAUDHUBDQGWhgadudgahdbhfqygIBU
 banner -Cl $(cat /etc/motd)
 banner -Cl $(cat /etc/passwd)
