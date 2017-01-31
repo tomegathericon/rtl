@@ -3,16 +3,28 @@
 set -x
 
 export AUR=/aur
+export BUILD=/home/tomegathericon/build
+
 
 for f in $@;
 
 do 
 
+abs_path=$(find /var/abs/ -name $f | grep $f)
+
 find /var/abs/ -name $f | grep $f
 
 if [ $? -eq 0 ]; then
 
-sudo pacman -S $f
+sudo rsync -arvhP $abs_path $BUILD
+
+sudo chown -R tomegathericon:wheel $BUILD
+
+cd $BUILD/$f
+
+makepkg -si
+	
+#sudo pacman -S $f
 
 else
 
