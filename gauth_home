@@ -1,0 +1,57 @@
+#!/bin/zsh
+
+#set -x 
+
+#code=AIzaSyD-frOXVD3LcCESNPude9lH_CZLFfKhnpE
+clientID="901156217549-ai6ob6ei3o2jaspa6s768es3nd971uqp.apps.googleusercontent.com"
+clientSecret="f6owbeUSHQZRM4eY1zFsZO6X"
+uri="http://git.impressicocrm.com/users/auth/google_oauth2/callback"
+header="Content-Type: application/x-www-form-urlencoded"
+emailID="bigfootinc@gmail.com"
+grant_type=http://oauth.net/grant_type/device/1.0
+
+function get_access_token()
+
+{
+
+code_content=$(curl -d "client_id=$clientID&scope=profile email https://www.googleapis.com/auth/calendar https://www.google.com/m8/feeds" https://accounts.google.com/o/oauth2/device/code)
+user_code=$(echo $code_content | jq -r '.user_code')
+device_code=$(echo $code_content | jq -r '.device_code')
+verification_url=$(echo $code_content | jq -r '.verification_url')
+
+echo "Please visit $verification_url and enter $user_code. Once done press enter to continue script execution."
+
+read
+
+token_content=$(curl -d code=$device_code -d client_id=$clientID -d client_secret=$clientSecret -d grant_type=$grant_type https://accounts.google.com/o/oauth2/token)
+
+echo $token_content | tee $(pwd)/gauth_token_home
+ 
+echo "The content of the Token has been stored in $(pwd)/gauth_token_home"
+
+}
+
+
+function refresh_access_token()
+
+{
+
+refresh_token=$(cat $(pwd)/gauth_token_home | jq -r '.refresh_token')
+
+curl -d client_id=$clientID -d client_secret=$clientSecret -d grant_type=refresh_token -d refresh_token=$refresh_token https://accounts.google.com/o/oauth2/token
+
+}
+
+
+for f in $@
+
+do
+
+$f
+
+shift
+
+done
+
+
+

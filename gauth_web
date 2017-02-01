@@ -1,0 +1,26 @@
+#!/bin/zsh
+
+set -x 
+
+#code=AIzaSyD-frOXVD3LcCESNPude9lH_CZLFfKhnpE
+clientID="171118307153-88lc0ev1nvok6s4770mohntqggsop5pb.apps.googleusercontent.com"
+clientSecret="oto72tb8eKt7UhrFKSGIbWUA"
+uri="http://git.impressicocrm.com/users/auth/google_oauth2/callback"
+header="Content-Type: application/x-www-form-urlencoded"
+emailID="kapoor.a@impressico.com"
+
+
+code=$(curl -d "client_id=$clientID&scope=email" https://accounts.google.com/o/oauth2/device/code | jq -r '.device_code')
+#curl -d "client_id=$clientID&scope=email" https://accounts.google.com/o/oauth2/device/code | jq -r '.'
+
+
+
+curl -d code=$code -d client_id=$emailID -d client_secret=$clientSecret -d grant_type=authorization_code -d scope=profile https://accounts.google.com/o/oauth2/token
+ 
+
+
+
+# -d redirect_uri=$uri 
+
+
+
